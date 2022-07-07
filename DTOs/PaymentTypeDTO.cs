@@ -9,6 +9,5 @@ namespace g2hotel_server.DTOs
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        public ICollection<PaymentDTO>? Payments { get; set; }
     }
 }

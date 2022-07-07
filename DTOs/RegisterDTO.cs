@@ -11,5 +11,6 @@ namespace g2hotel_server.DTOs
         [Required] public string Email { get; set; } = null!;
         [Required] public string Username { get; set; } = null!;
         [Required] public string Password { get; set; } = null!;
+        [Required] public IEnumerable<String> Roles { get; set; } = null!;
     }
 }

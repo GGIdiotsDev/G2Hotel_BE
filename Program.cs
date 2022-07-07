@@ -1,9 +1,7 @@
 using g2hotel_server.Data;
 using g2hotel_server.Entities;
 using g2hotel_server.Extensions;
-using g2hotel_server.Helper;
-using g2hotel_server.Services.Implements;
-using g2hotel_server.Services.Interfaces;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +30,7 @@ app.UseHttpsRedirection();
 app.UseCors(x => x.AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()
-    .WithOrigins("http://localhost:3000"));
+    .WithOrigins("https://g2hotel.vercel.app"));
 
 app.UseAuthentication();
 app.UseAuthorization();

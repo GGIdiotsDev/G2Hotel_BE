@@ -17,6 +17,7 @@ namespace g2hotel_server.Data
         }
 
         public DbSet<Room> Rooms { get; set; } = null!;
+        public DbSet<RoomType> RoomTypes { get; set; } = null!;
         public DbSet<Photo> Photos { get; set; } = null!;
         public DbSet<Customer> Customers { get; set; } = null!;
         public DbSet<DetailRoomPayment> DetailRoomPayments { get; set; } = null!;

@@ -49,6 +49,27 @@ namespace g2hotel_server.Services.Implements
             .ToListAsync();
         }
 
+        public async Task<IEnumerable<Room>> GetRoomsByCheckInDateAsync(DateTime checkInDate, DateTime checkOutDate)
+        {
+            //set time to 14:00:00 for check in date
+            checkInDate = checkInDate.Date.AddHours(14);
+            var listRooms = await _context.Rooms.Include(r => r.DetailRoomPayments).ToListAsync();
+            //loop through list room available and add amount of detail room payment to room with condition checkInDate >= detail room payment.CheckOutDate
+            foreach (var room in listRooms)
+            {
+                if (room.DetailRoomPayments != null)
+                {
+                    var detailRoomPayments = room.DetailRoomPayments.Where(x => x.CheckOutDate <= checkInDate).ToList();
+                    foreach (var detailRoomPayment in detailRoomPayments)
+                    {
+                        room.Amount += detailRoomPayment.Amount;
+                    }
+                }
+            }
+
+            return listRooms;
+        }
+
         public async Task<bool> RoomCodeExists(string code)
         {
             return await _context.Rooms.AnyAsync(x => x.Code == code);

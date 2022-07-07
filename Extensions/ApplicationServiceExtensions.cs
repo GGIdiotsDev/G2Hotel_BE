@@ -15,11 +15,14 @@ namespace g2hotel_server.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
+            services.Configure<MailSettings>(config.GetSection("MailSettings"));
             services.AddMemoryCache();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<IMailService, MailService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
+            services.AddHttpContextAccessor();
             // builder.Services.AddDbContext<DataContext>(options =>
             //     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
             services.AddDbContext<DataContext>(options =>

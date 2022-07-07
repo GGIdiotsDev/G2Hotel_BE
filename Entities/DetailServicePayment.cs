@@ -12,6 +12,7 @@ namespace g2hotel_server.Entities
         public int PaymentId { get; set; }
         public Payment Payment { get; set; } = null!;
         public int ServiceId { get; set; }
-        public Service Services { get; set; } = null!;
+        public Service Service { get; set; } = null!;
+        public int Amount { get; set; }
     }
 }

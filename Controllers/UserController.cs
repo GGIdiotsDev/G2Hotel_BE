@@ -9,7 +9,7 @@ using g2hotel_server.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authorization;
 namespace g2hotel_server.Controllers
 {
     public class UserController : BaseApiController
@@ -29,6 +29,7 @@ namespace g2hotel_server.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register(RegisterDTO registerDTO)
         {
@@ -39,7 +40,8 @@ namespace g2hotel_server.Controllers
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            var roleResult = await _userManager.AddToRoleAsync(user, "Member");
+            // var roleResult = await _userManager.AddToRoleAsync(user, "Member");
+            var roleResult = await _userManager.AddToRolesAsync(user, registerDTO.Roles);
             if (!roleResult.Succeeded) return BadRequest(result.Errors);
 
             return new UserDTO
@@ -71,6 +73,7 @@ namespace g2hotel_server.Controllers
             };
         }
 
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<MemberDTO>>> GetAllUsers()
         {
@@ -79,11 +82,46 @@ namespace g2hotel_server.Controllers
             return Ok(usersDto);
         }
 
-        //bug here
-        [HttpDelete("del")]
-        private async Task<ActionResult<MemberDTO>> DeleteUser(MemberDTO memberDTO)
+        [Authorize(Policy = "RequireAdminRole")]
+        [HttpGet("{username}")]
+        public async Task<ActionResult<UserUpdateDTO>> GetUser(string username)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(memberDTO.Username);
+            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+            if (user == null) return NotFound();
+
+            //get all roles of user
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var userDto = _mapper.Map<UserUpdateDTO>(user);
+            userDto.Roles = roles;
+
+            return Ok(userDto);
+        }
+
+        [Authorize(Policy = "RequireAdminRole")]
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(UserUpdateDTO memberUpdateDto)
+        {
+
+            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(memberUpdateDto.Username);
+
+            _mapper.Map(memberUpdateDto, user);
+            await _userManager.RemoveFromRolesAsync(user, await _userManager.GetRolesAsync(user));
+            await _userManager.AddToRolesAsync(user, memberUpdateDto.Roles);
+
+            _unitOfWork.UserRepository.Update(user);
+
+            if (await _unitOfWork.Complete()) return NoContent();
+
+            return BadRequest("Failed to update user");
+        }
+
+
+        [Authorize(Policy = "RequireAdminRole")]
+        [HttpDelete("del/{username}")]
+        public async Task<ActionResult> DeleteUser(string username)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
             if (user == null) return NotFound("User does not exist");
             _unitOfWork.UserRepository.Delete(user);
             if (await _unitOfWork.Complete()) return Ok();

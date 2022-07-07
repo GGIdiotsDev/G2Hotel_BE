@@ -12,8 +12,8 @@ using g2hotel_server.Data;
 namespace g2hotel_server.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220622132327_initialdb")]
-    partial class initialdb
+    [Migration("20220630141510_add_soluong_phong")]
+    partial class add_soluong_phong
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -397,7 +397,10 @@ namespace g2hotel_server.Data.Migrations
                     b.Property<string>("PublicId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoomId")
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoomTypeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("Status")
@@ -419,6 +422,8 @@ namespace g2hotel_server.Data.Migrations
 
                     b.HasIndex("RoomId");
 
+                    b.HasIndex("RoomTypeId");
+
                     b.ToTable("Photos");
                 });
 
@@ -429,6 +434,9 @@ namespace g2hotel_server.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -492,6 +500,7 @@ namespace g2hotel_server.Data.Migrations
                         new
                         {
                             Id = 1,
+                            Amount = 0,
                             Code = "ROOM-01",
                             DefaultPrice = 100000m,
                             Description = "Room 1 description",
@@ -505,6 +514,7 @@ namespace g2hotel_server.Data.Migrations
                         new
                         {
                             Id = 2,
+                            Amount = 0,
                             Code = "ROOM-02",
                             DefaultPrice = 200000m,
                             Description = "Room 2 description",
@@ -518,6 +528,7 @@ namespace g2hotel_server.Data.Migrations
                         new
                         {
                             Id = 3,
+                            Amount = 0,
                             Code = "ROOM-03",
                             DefaultPrice = 300000m,
                             Description = "Room 3 description",
@@ -531,6 +542,7 @@ namespace g2hotel_server.Data.Migrations
                         new
                         {
                             Id = 4,
+                            Amount = 0,
                             Code = "ROOM-04",
                             DefaultPrice = 400000m,
                             Description = "Room 4 description",
@@ -603,7 +615,7 @@ namespace g2hotel_server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PromotionPrice")
+                    b.Property<decimal?>("PromotionPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("Status")
@@ -793,11 +805,15 @@ namespace g2hotel_server.Data.Migrations
 
                     b.HasOne("g2hotel_server.Entities.Room", "Room")
                         .WithMany("Photos")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoomId");
+
+                    b.HasOne("g2hotel_server.Entities.RoomType", "RoomType")
+                        .WithMany("Photos")
+                        .HasForeignKey("RoomTypeId");
 
                     b.Navigation("Room");
+
+                    b.Navigation("RoomType");
                 });
 
             modelBuilder.Entity("g2hotel_server.Entities.Room", b =>
@@ -881,6 +897,8 @@ namespace g2hotel_server.Data.Migrations
 
             modelBuilder.Entity("g2hotel_server.Entities.RoomType", b =>
                 {
+                    b.Navigation("Photos");
+
                     b.Navigation("Rooms");
                 });
 

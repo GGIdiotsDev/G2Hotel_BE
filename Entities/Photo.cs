@@ -10,6 +10,9 @@ namespace g2hotel_server.Entities
         public bool IsMain { get; set; }
         public string? PublicId { get; set; }
         public Room? Room { get; set; }
-        public int RoomId { get; set; }
+        public int? RoomId { get; set; }
+
+        public RoomType? RoomType { get; set; }
+        public int? RoomTypeId { get; set; }
     }
 }

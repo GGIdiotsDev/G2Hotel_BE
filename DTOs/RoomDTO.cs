@@ -13,10 +13,12 @@ namespace g2hotel_server.DTOs
         public string? ShortDescription { get; set; }
         public string? Description { get; set; }
         public decimal DefaultPrice { get; set; }
-        public decimal PromotionPrice { get; set; }
+        public decimal? PromotionPrice { get; set; }
         public int NumBeds { get; set; }
         public int NumAdults { get; set; }
         public int NumChilds { get; set; }
+        public int Amount { get; set; }
+        public int RoomTypeId { get; set; }
         public ICollection<PhotoDTO>? Photos { get; set; }
     }
 }

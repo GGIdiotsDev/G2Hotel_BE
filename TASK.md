@@ -1,7 +1,11 @@
-### Sang
+### Reset password (admin) - send mail (user) /2hours
 
--   Thêm xóa sửa RoomType
+### Thay đổi password (n) /1hour
 
-### Quang
+### Send mail payment for client /1hour
 
--   Thêm xóa sửa Service
+### Service / 3hours
+
+### Policy page /30m
+
+### Contact page/30m
