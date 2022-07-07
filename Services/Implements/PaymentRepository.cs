@@ -6,6 +6,7 @@ using AutoMapper;
 using g2hotel_server.Data;
 using g2hotel_server.Entities;
 using g2hotel_server.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace g2hotel_server.Services.Implements
 {
@@ -18,12 +19,12 @@ namespace g2hotel_server.Services.Implements
             _context = context;
             _mapper = mapper;
         }
-        public void AddPayment(Payment payment)
+        public Payment AddPayment(Payment payment)
         {
-            _context.Payments.Add(payment);
+            return _context.Payments.Add(payment).Entity;
         }
 
-        public void AddDetailRoomPayment(int paymentId, List<Room> rooms, DateTime checkInDate, DateTime checkOutDate, int amount)
+        public void AddDetailRoomPayment(int paymentId, List<Room> rooms, DateTime checkInDate, DateTime checkOutDate)
         {
             if (_context.Payments.Find(paymentId) == null)
             {
@@ -45,7 +46,7 @@ namespace g2hotel_server.Services.Implements
                             RoomId = room.Id,
                             CheckInDate = checkInDate,
                             CheckOutDate = checkOutDate,
-                            Amount = amount
+                            Amount = room.Amount
                         };
                         _context.DetailRoomPayments.Add(detailRoomPayment);
                     }
@@ -60,14 +61,24 @@ namespace g2hotel_server.Services.Implements
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Payment>> GetPaymentsAsync()
+        public async Task<IEnumerable<Payment>> GetPaymentsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Payments.ToListAsync();
         }
 
-        public void Update(Payment payment)
+        public async Task<Payment> GetPaymentByOrderIdAsync(long orderId)
         {
-            _context.Payments.Remove(payment);
+            return await _context.Payments.FirstOrDefaultAsync(r => r.OrderId == orderId) ?? throw new Exception("Payment not found");
+        }
+
+        public async Task<Payment> GetDetailPaymentByOrderIdAsync(long orderId)
+        {
+            return await _context.Payments.Where(p => p.OrderId == orderId)
+            .Include(d => d.DetailRoomPayments)
+            .Include(d => d.DetailServicePayments)
+            .Include(c => c.Customer)
+            .Include(pmt => pmt.PaymentType)
+            .FirstOrDefaultAsync() ?? throw new Exception("Payment not found");
         }
     }
 }

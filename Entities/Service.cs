@@ -12,7 +12,7 @@ namespace g2hotel_server.Entities
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public decimal DefaultPrice { get; set; }
-        public decimal PromotionPrice { get; set; }
+        public decimal? PromotionPrice { get; set; }
         public IList<DetailServicePayment>? DetailServicePayments { get; set; }
     }
 }

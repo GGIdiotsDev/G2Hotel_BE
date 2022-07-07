@@ -8,10 +8,12 @@ namespace g2hotel_server.Services.Interfaces
 {
     public interface IPaymentRepository
     {
-        void AddPayment(Payment payment);
-        void AddDetailRoomPayment(int paymentId, List<Room> rooms, DateTime checkInDate, DateTime checkOutDate, int amount);
-        void Update(Payment payment);
+        Payment AddPayment(Payment payment);
+        void AddDetailRoomPayment(int paymentId, List<Room> rooms, DateTime checkInDate, DateTime checkOutDate);
         Task<IEnumerable<Payment>> GetPaymentsAsync();
         Task<Payment> GetPaymentByIdAsync(int id);
+        Task<Payment> GetPaymentByOrderIdAsync(long orderId);
+        Task<Payment> GetDetailPaymentByOrderIdAsync(long orderId);
+
     }
 }

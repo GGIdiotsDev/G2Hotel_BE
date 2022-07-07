@@ -13,6 +13,7 @@ namespace g2hotel_server.Services.Interfaces
         void Delete(Room room);
         Task<bool> RoomCodeExists(string code);
         Task<IEnumerable<Room>> GetRoomsAsync();
+        Task<IEnumerable<Room>> GetRoomsByCheckInDateAsync(DateTime checkInDate, DateTime checkOutDate);
         Task<Room> GetRoomByIdAsync(int id);
         Task<Room> GetRoomByCodeAsync(string code);
     }

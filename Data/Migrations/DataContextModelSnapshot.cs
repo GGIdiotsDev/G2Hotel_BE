@@ -155,14 +155,6 @@ namespace g2hotel_server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CitizenIdentity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -170,8 +162,9 @@ namespace g2hotel_server.Data.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -245,6 +238,9 @@ namespace g2hotel_server.Data.Migrations
                     b.Property<int>("ServiceId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -277,6 +273,9 @@ namespace g2hotel_server.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("BankCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -284,8 +283,17 @@ namespace g2hotel_server.Data.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<long>("OrderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PayStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("PaymentTranId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("PaymentTypeId")
                         .HasColumnType("int");
@@ -395,7 +403,10 @@ namespace g2hotel_server.Data.Migrations
                     b.Property<string>("PublicId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoomId")
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoomTypeId")
                         .HasColumnType("int");
 
                     b.Property<bool>("Status")
@@ -417,6 +428,8 @@ namespace g2hotel_server.Data.Migrations
 
                     b.HasIndex("RoomId");
 
+                    b.HasIndex("RoomTypeId");
+
                     b.ToTable("Photos");
                 });
 
@@ -427,6 +440,9 @@ namespace g2hotel_server.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -458,7 +474,7 @@ namespace g2hotel_server.Data.Migrations
                     b.Property<int>("NumChilds")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("PromotionPrice")
+                    b.Property<decimal?>("PromotionPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("RoomTypeId")
@@ -490,6 +506,7 @@ namespace g2hotel_server.Data.Migrations
                         new
                         {
                             Id = 1,
+                            Amount = 0,
                             Code = "ROOM-01",
                             DefaultPrice = 100000m,
                             Description = "Room 1 description",
@@ -497,12 +514,12 @@ namespace g2hotel_server.Data.Migrations
                             NumAdults = 0,
                             NumBeds = 0,
                             NumChilds = 0,
-                            PromotionPrice = 0m,
                             Status = false
                         },
                         new
                         {
                             Id = 2,
+                            Amount = 0,
                             Code = "ROOM-02",
                             DefaultPrice = 200000m,
                             Description = "Room 2 description",
@@ -510,12 +527,12 @@ namespace g2hotel_server.Data.Migrations
                             NumAdults = 0,
                             NumBeds = 0,
                             NumChilds = 0,
-                            PromotionPrice = 0m,
                             Status = false
                         },
                         new
                         {
                             Id = 3,
+                            Amount = 0,
                             Code = "ROOM-03",
                             DefaultPrice = 300000m,
                             Description = "Room 3 description",
@@ -523,12 +540,12 @@ namespace g2hotel_server.Data.Migrations
                             NumAdults = 0,
                             NumBeds = 0,
                             NumChilds = 0,
-                            PromotionPrice = 0m,
                             Status = false
                         },
                         new
                         {
                             Id = 4,
+                            Amount = 0,
                             Code = "ROOM-04",
                             DefaultPrice = 400000m,
                             Description = "Room 4 description",
@@ -536,7 +553,6 @@ namespace g2hotel_server.Data.Migrations
                             NumAdults = 0,
                             NumBeds = 0,
                             NumChilds = 0,
-                            PromotionPrice = 0m,
                             Status = false
                         });
                 });
@@ -601,7 +617,7 @@ namespace g2hotel_server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PromotionPrice")
+                    b.Property<decimal?>("PromotionPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("Status")
@@ -729,7 +745,7 @@ namespace g2hotel_server.Data.Migrations
             modelBuilder.Entity("g2hotel_server.Entities.DetailRoomPayment", b =>
                 {
                     b.HasOne("g2hotel_server.Entities.Payment", "Payment")
-                        .WithMany()
+                        .WithMany("DetailRoomPayments")
                         .HasForeignKey("PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -753,7 +769,7 @@ namespace g2hotel_server.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("g2hotel_server.Entities.Service", "Services")
+                    b.HasOne("g2hotel_server.Entities.Service", "Service")
                         .WithMany("DetailServicePayments")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -761,16 +777,14 @@ namespace g2hotel_server.Data.Migrations
 
                     b.Navigation("Payment");
 
-                    b.Navigation("Services");
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("g2hotel_server.Entities.Payment", b =>
                 {
                     b.HasOne("g2hotel_server.Entities.Customer", "Customer")
                         .WithMany("Payments")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerId");
 
                     b.HasOne("g2hotel_server.Entities.PaymentType", "PaymentType")
                         .WithMany("Payments")
@@ -791,11 +805,15 @@ namespace g2hotel_server.Data.Migrations
 
                     b.HasOne("g2hotel_server.Entities.Room", "Room")
                         .WithMany("Photos")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoomId");
+
+                    b.HasOne("g2hotel_server.Entities.RoomType", "RoomType")
+                        .WithMany("Photos")
+                        .HasForeignKey("RoomTypeId");
 
                     b.Navigation("Room");
+
+                    b.Navigation("RoomType");
                 });
 
             modelBuilder.Entity("g2hotel_server.Entities.Room", b =>
@@ -862,6 +880,8 @@ namespace g2hotel_server.Data.Migrations
 
             modelBuilder.Entity("g2hotel_server.Entities.Payment", b =>
                 {
+                    b.Navigation("DetailRoomPayments");
+
                     b.Navigation("DetailServicePayments");
                 });
 
@@ -879,6 +899,8 @@ namespace g2hotel_server.Data.Migrations
 
             modelBuilder.Entity("g2hotel_server.Entities.RoomType", b =>
                 {
+                    b.Navigation("Photos");
+
                     b.Navigation("Rooms");
                 });
 

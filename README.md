@@ -10,7 +10,7 @@ dotnet restore
 
 ```
 dotnet ef migrations add -o Data/Migrations InitialDb
-dotnet ef update database
+dotnet ef database update
 ```
 
 -   Chạy prj

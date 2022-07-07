@@ -12,9 +12,7 @@ namespace g2hotel_server.Entities
         public int Id { get; set; }
         public string FullName { get; set; } = null!;
         public string Phone { get; set; } = null!;
-        public string Address { get; set; } = null!;
-        public DateTime DateOfBirth { get; set; }
-        public string CitizenIdentity { get; set; } = null!;
+        public string Email { get; set; } = null!;
         public ICollection<Payment>? Payments { get; set; }
     }
 }

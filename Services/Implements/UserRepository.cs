@@ -34,6 +34,7 @@ namespace g2hotel_server.Services.Implements
         {
             return await _context.Users
                 .Include(p => p.Photos)
+                .Include(r => r.UserRoles)
                 .SingleOrDefaultAsync(x => x.UserName == username) ?? throw new Exception("User not found");
         }
 

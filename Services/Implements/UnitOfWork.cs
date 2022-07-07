@@ -27,6 +27,14 @@ namespace g2hotel_server.Services.Implements
 
         public IUserRepository UserRepository => new UserRepository(_context, _mapper);
 
+        public IServiceRepository ServiceRepository => new ServiceRepository(_context, _mapper);
+
+        public IRoomTypeRepository RoomTypeRepository => new RoomTypeRepository(_context, _mapper);
+
+        public ICustomerRepository CustomerRepository => new CustomerRepository(_context, _mapper);
+
+        public IDetailRoomPaymentRepository DetailRoomPaymentRepository => new DetailRoomPaymentRepository(_context, _mapper);
+
         public async Task<bool> Complete()
         {
             return await _context.SaveChangesAsync() > 0;

@@ -13,5 +13,6 @@ namespace g2hotel_server.Entities
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public ICollection<Room>? Rooms { get; set; }
+        public ICollection<Photo>? Photos { get; set; }
     }
 }

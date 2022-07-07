@@ -55,8 +55,10 @@ namespace g2hotel_server.Extensions
 
             services.AddAuthorization(opt =>
             {
-                opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
-                opt.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
+                //user < admin < moderator
+                opt.AddPolicy("RequireMemberRole", policy => policy.RequireRole("Member", "Admin", "Moderator"));
+                opt.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin", "Moderator"));
+                opt.AddPolicy("RequireModeratorRole", policy => policy.RequireRole("Moderator"));
             });
 
             return services;

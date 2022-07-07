@@ -6,6 +6,7 @@ using AutoMapper;
 using g2hotel_server.DTOs;
 using g2hotel_server.Entities;
 using g2hotel_server.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -25,7 +26,9 @@ namespace g2hotel_server.Controllers
             _memoryCache = memoryCache;
         }
 
+
         [HttpPost("add-room")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult<RoomDTO>> AddRoom(RoomDTO roomDto)
         {
             if (_unitOfWork.RoomRepository.RoomCodeExists(roomDto.Code).Result)
@@ -35,6 +38,10 @@ namespace g2hotel_server.Controllers
 
             var room = _mapper.Map<Room>(roomDto);
             var roomAddedEntity = _unitOfWork.RoomRepository.AddRoom(room);
+
+            var roomType = _unitOfWork.RoomTypeRepository.GetRoomTypeById(roomDto.RoomTypeId).Result;
+            roomType.Rooms?.Add(roomAddedEntity);
+
             if (await _unitOfWork.Complete())
             {
                 var cacheKey = "room_added";
@@ -82,6 +89,7 @@ namespace g2hotel_server.Controllers
 
         //Delete room by id
         [HttpDelete("delete-room/{id}")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult<RoomDTO>> DeleteRoom(int id)
         {
             var roomEntity = await _unitOfWork.RoomRepository.GetRoomByIdAsync(id);
@@ -98,6 +106,7 @@ namespace g2hotel_server.Controllers
         }
 
         [HttpPost("add-photo")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult<PhotoDTO>> AddPhoto(IFormFile file)
         {
             var roomAdded = _memoryCache.Get<Room>("room_added");
@@ -133,6 +142,7 @@ namespace g2hotel_server.Controllers
         }
 
         [HttpPost("add-multi-photo")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult<PhotoDTO>> AddMultiPhoto(IList<IFormFile> files)
         {
             var roomAdded = _memoryCache.Get<Room>("room_added");
@@ -141,7 +151,6 @@ namespace g2hotel_server.Controllers
                 return BadRequest("Room not added");
             }
             var room = _unitOfWork.RoomRepository.GetRoomByCodeAsync(roomAdded.Code).Result;
-            // var room = _unitOfWork.RoomRepository.GetRoomByCodeAsync("ROOM-VIP").Result;
             room.Photos = new List<Photo>();
             List<Photo> photos = new List<Photo>();
             foreach (var file in files)
@@ -174,7 +183,8 @@ namespace g2hotel_server.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> UpdateUser(RoomUpdateDTO roomDTO)
+        [Authorize(Policy = "RequireMemberRole")]
+        public async Task<ActionResult> UpdateRoom(RoomUpdateDTO roomDTO)
         {
 
             var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(roomDTO.Id);
@@ -189,6 +199,7 @@ namespace g2hotel_server.Controllers
         }
 
         [HttpDelete("delete-photo")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult> DeletePhoto(DeletePhotoDTO deletePhotoDTO)
         {
             var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(deletePhotoDTO.roomId);
@@ -218,6 +229,7 @@ namespace g2hotel_server.Controllers
 
         //delete multiple photos
         [HttpDelete("delete-multi-photo")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult> DeleteMultiPhoto(DeleteMultiPhotoDTO deleteMultiPhotoDTO)
         {
             var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(deleteMultiPhotoDTO.roomId);
@@ -245,6 +257,7 @@ namespace g2hotel_server.Controllers
         }
 
         [HttpPost("add-multi-photo/{roomId}")]
+        [Authorize(Policy = "RequireMemberRole")]
         public async Task<ActionResult<PhotoDTO>> AddMultiPhotoWithRoomId(IList<IFormFile> files, int roomId)
         {
             var room = _unitOfWork.RoomRepository.GetRoomByIdAsync(roomId).Result;
@@ -274,6 +287,15 @@ namespace g2hotel_server.Controllers
             if (await _unitOfWork.Complete()) return Ok();
 
             return BadRequest("Problem addding photo");
+        }
+
+
+        [HttpGet("test-filter")]
+        public async Task<ActionResult<IEnumerable<RoomDTO>>> TestFilter(DateFilterDTO dateFilterDTO)
+        {
+            var rooms = await _unitOfWork.RoomRepository.GetRoomsByCheckInDateAsync(dateFilterDTO.checkIn, dateFilterDTO.checkOut);
+            var roomDTOs = _mapper.Map<IEnumerable<RoomDTO>>(rooms);
+            return Ok(roomDTOs);
         }
 
 
